@@ -10,14 +10,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Demostración del Sistema de Gestión de Asesoría y Soporte Técnico
- * A&M Computer Solutions SAC
- *
- * Cubre el ciclo completo:
- *  registro de usuarios → autenticación → registro de casos →
- *  clasificación → asignación → atención → resolución → pago → cierre
- */
 public class Main {
 
     public static void main(String[] args) {
@@ -31,9 +23,7 @@ public class Main {
         CatalogoServicios catalogo = new CatalogoServicios();
         GestorCobranza gestorCobranza = new GestorCobranza();
 
-        // ------------------------------------------------------------------
-        // 1. REGISTRO DE USUARIOS
-        // ------------------------------------------------------------------
+      
         System.out.println("--- 1. REGISTRO DE USUARIOS ---\n");
 
         Cliente cliente1 = gestorUsuarios.registrarCliente(
@@ -64,9 +54,7 @@ public class Main {
                 "caja1", "caja123", "Pedro Sánchez");
         System.out.println("Cajero registrado: " + cajero.getPerfil());
 
-        // ------------------------------------------------------------------
-        // 2. AUTENTICACIÓN
-        // ------------------------------------------------------------------
+     
         System.out.println("\n--- 2. AUTENTICACIÓN ---\n");
 
         try {
@@ -82,9 +70,7 @@ public class Main {
             System.out.println("Login fallido (esperado): " + e.getMessage());
         }
 
-        // ------------------------------------------------------------------
-        // 3. REGISTRO DE SOLICITUDES
-        // ------------------------------------------------------------------
+     
         System.out.println("\n--- 3. REGISTRO DE SOLICITUDES ---\n");
 
         CasoAsesoria casoAsesoria = gestorCasos.registrarAsesoria(
@@ -105,9 +91,7 @@ public class Main {
         System.out.println("Caso soporte creado: " + casoSoporte);
         System.out.println("  Equipo: " + casoSoporte.getEquipo());
 
-        // ------------------------------------------------------------------
-        // 4. CLASIFICACIÓN Y ASIGNACIÓN
-        // ------------------------------------------------------------------
+       
         System.out.println("\n--- 4. CLASIFICACIÓN Y ASIGNACIÓN ---\n");
 
         coord.clasificarCaso(casoAsesoria, AreaTecnica.HARDWARE, Prioridad.BAJA);
@@ -137,9 +121,7 @@ public class Main {
                     + ": " + sugerido2.cargaActiva());
         }
 
-        // ------------------------------------------------------------------
-        // 5. PROGRAMAR CITA
-        // ------------------------------------------------------------------
+  
         System.out.println("\n--- 5. PROGRAMAR CITA ---\n");
 
         Cita cita = coord.programarCita(
@@ -149,16 +131,13 @@ public class Main {
                 "Recepción del equipo para diagnóstico");
         System.out.println("Cita programada: " + cita);
 
-        // ------------------------------------------------------------------
-        // 6. ATENCIÓN DEL CASO DE SOPORTE
-        // ------------------------------------------------------------------
+ 
         System.out.println("\n--- 6. ATENCIÓN DEL CASO DE SOPORTE ---\n");
 
         Asesor atiende = casoSoporte.getAsesor();
         casoSoporte.iniciarAtencion(atiende);
         System.out.println("Atención iniciada. Estado: " + casoSoporte.getEstado());
 
-        // Intento de registrar solución sin diagnóstico (debe fallar)
         System.out.println("\nIntentando registrar solución sin diagnóstico...");
         try {
             casoSoporte.registrarSolucion("Se cambió la fuente de poder", atiende);
@@ -174,7 +153,6 @@ public class Main {
                 "Se reemplazó la fuente de poder original por una compatible de 90W.", atiende);
         System.out.println("Solución registrada.");
 
-        // Definir servicio y costo
         Servicio servSoporte = catalogo.listarPorTipo(TipoAtencion.SOPORTE_TECNICO).stream()
                 .filter(s -> s.getArea() == AreaTecnica.HARDWARE)
                 .findFirst()
@@ -186,9 +164,7 @@ public class Main {
         casoSoporte.resolver(atiende);
         System.out.println("Caso resuelto. Estado: " + casoSoporte.getEstado());
 
-        // ------------------------------------------------------------------
-        // 7. ATENCIÓN DEL CASO DE ASESORÍA
-        // ------------------------------------------------------------------
+
         System.out.println("\n--- 7. ATENCIÓN DEL CASO DE ASESORÍA ---\n");
 
         Asesor atiendeAse = casoAsesoria.getAsesor();
@@ -212,9 +188,7 @@ public class Main {
         casoAsesoria.resolver(atiendeAse);
         System.out.println("Caso resuelto. Estado: " + casoAsesoria.getEstado());
 
-        // ------------------------------------------------------------------
-        // 8. INTENTO DE CERRAR SIN PAGO (debe fallar)
-        // ------------------------------------------------------------------
+ 
         System.out.println("\n--- 8. INTENTO DE CERRAR SIN PAGO ---\n");
 
         try {
@@ -223,12 +197,8 @@ public class Main {
             System.out.println("RECHAZADO (esperado): " + e.getMessage());
         }
 
-        // ------------------------------------------------------------------
-        // 9. REGISTRO DE PAGO Y COMPROBANTE
-        // ------------------------------------------------------------------
         System.out.println("\n--- 9. REGISTRO DE PAGO Y COMPROBANTE ---\n");
 
-        // Cliente con DNI → Boleta
         Pago pago1 = cajero.cobrar(casoAsesoria, MetodoPago.YAPE);
         gestorCobranza.registrar(pago1);
         System.out.println("Pago registrado (asesoría): " + pago1);
@@ -242,9 +212,6 @@ public class Main {
         System.out.println("  Comprobante: " + pago2.getComprobante());
         System.out.println("  Estado del caso: " + casoSoporte.getEstado());
 
-        // ------------------------------------------------------------------
-        // 10. CIERRE DE CASOS
-        // ------------------------------------------------------------------
         System.out.println("\n--- 10. CIERRE DE CASOS ---\n");
 
         casoAsesoria.cerrar(atiendeAse);
@@ -253,29 +220,17 @@ public class Main {
         casoSoporte.cerrar(atiende);
         System.out.println("Caso soporte cerrado. Estado: " + casoSoporte.getEstado());
 
-        // ------------------------------------------------------------------
-        // 11. CONSULTA DE SEGUIMIENTO
-        // ------------------------------------------------------------------
         System.out.println("\n--- 11. CONSULTA DE SEGUIMIENTO (Cliente) ---\n");
         System.out.println(cliente1.consultarSeguimiento(casoAsesoria.getId()));
 
-        // ------------------------------------------------------------------
-        // 12. RESUMEN POR ESTADO
-        // ------------------------------------------------------------------
         System.out.println("--- 12. RESUMEN DE CASOS POR ESTADO ---\n");
         Map<EstadoCaso, Long> resumen = coord.resumenPorEstado(gestorCasos.listarTodos());
         resumen.forEach((estado, cantidad) ->
                 System.out.println("  " + estado + ": " + cantidad));
 
-        // ------------------------------------------------------------------
-        // 13. CATÁLOGO DE SERVICIOS
-        // ------------------------------------------------------------------
         System.out.println("\n--- 13. CATÁLOGO DE SERVICIOS ---\n");
         catalogo.listar().forEach(s -> System.out.println("  " + s));
 
-        // ------------------------------------------------------------------
-        // 14. NOTIFICACIONES
-        // ------------------------------------------------------------------
         System.out.println("\n--- 14. NOTIFICACIONES DEL CLIENTE ---\n");
         cliente1.getNotificaciones().forEach(n -> System.out.println("  • " + n));
 
